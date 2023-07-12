@@ -1,0 +1,13 @@
+{
+  "info": {
+  "name": "OSPRAY_EXTENSIONS",
+  "type": "core",
+  "dependencies": [
+      "ospray_device",
+      "ospray_renderer_default",
+      "ospray_renderer_scivis",
+      "ospray_renderer_debug"
+    ]
+  }
+}
+

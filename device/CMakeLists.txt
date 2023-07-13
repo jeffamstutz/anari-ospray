@@ -66,6 +66,7 @@ project_sources(PRIVATE
   scene/surface/material/sampler/Sampler.cpp
   scene/volume/TransferFunction1D.cpp
   scene/volume/Volume.cpp
+  scene/volume/spatial_field/AMRField.cpp
   scene/volume/spatial_field/SpatialField.cpp
   scene/volume/spatial_field/StructuredRegularField.cpp
 )

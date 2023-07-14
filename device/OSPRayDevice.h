@@ -101,6 +101,27 @@ struct OSPRayDevice : public helium::BaseDevice
 
   void unsetParameter(ANARIObject o, const char *name) override;
 
+  void* mapParameterArray1D(ANARIObject object,
+      const char* name,
+      ANARIDataType dataType,
+      uint64_t numElements1,
+      uint64_t *elementStride) override;
+  void* mapParameterArray2D(ANARIObject object,
+      const char* name,
+      ANARIDataType dataType,
+      uint64_t numElements1,
+      uint64_t numElements2,
+      uint64_t *elementStride) override;
+  void* mapParameterArray3D(ANARIObject object,
+      const char* name,
+      ANARIDataType dataType,
+      uint64_t numElements1,
+      uint64_t numElements2,
+      uint64_t numElements3,
+      uint64_t *elementStride) override;
+  void unmapParameterArray(ANARIObject object,
+      const char* name) override;
+
   void commitParameters(ANARIObject o) override;
 
   void release(ANARIObject o) override;

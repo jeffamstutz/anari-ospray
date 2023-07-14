@@ -68,7 +68,6 @@ ANARIArray1D OSPRayDevice::newArray1D(const void *appMemory,
     ANARIDataType type,
     uint64_t numItems)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
 
   Array1DMemoryDescriptor md;
@@ -91,7 +90,6 @@ ANARIArray2D OSPRayDevice::newArray2D(const void *appMemory,
     uint64_t numItems1,
     uint64_t numItems2)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
 
   Array2DMemoryDescriptor md;
@@ -113,7 +111,6 @@ ANARIArray3D OSPRayDevice::newArray3D(const void *appMemory,
     uint64_t numItems2,
     uint64_t numItems3)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
 
   Array3DMemoryDescriptor md;
@@ -144,7 +141,6 @@ void OSPRayDevice::unmapArray(ANARIArray a)
 
 ANARILight OSPRayDevice::newLight(const char *subtype)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return getHandleForAPI<ANARILight>(
       Light::createInstance(subtype, deviceState()));
@@ -152,7 +148,6 @@ ANARILight OSPRayDevice::newLight(const char *subtype)
 
 ANARICamera OSPRayDevice::newCamera(const char *subtype)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return getHandleForAPI<ANARICamera>(
       Camera::createInstance(subtype, deviceState()));
@@ -160,7 +155,6 @@ ANARICamera OSPRayDevice::newCamera(const char *subtype)
 
 ANARIGeometry OSPRayDevice::newGeometry(const char *subtype)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return getHandleForAPI<ANARIGeometry>(
       Geometry::createInstance(subtype, deviceState()));
@@ -168,7 +162,6 @@ ANARIGeometry OSPRayDevice::newGeometry(const char *subtype)
 
 ANARISpatialField OSPRayDevice::newSpatialField(const char *subtype)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return getHandleForAPI<ANARISpatialField>(
       SpatialField::createInstance(subtype, deviceState()));
@@ -176,14 +169,12 @@ ANARISpatialField OSPRayDevice::newSpatialField(const char *subtype)
 
 ANARISurface OSPRayDevice::newSurface()
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return createObjectForAPI<Surface, ANARISurface>(deviceState());
 }
 
 ANARIVolume OSPRayDevice::newVolume(const char *subtype)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return getHandleForAPI<ANARIVolume>(
       Volume::createInstance(subtype, deviceState()));
@@ -193,7 +184,6 @@ ANARIVolume OSPRayDevice::newVolume(const char *subtype)
 
 ANARIMaterial OSPRayDevice::newMaterial(const char *subtype)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return getHandleForAPI<ANARIMaterial>(
       Material::createInstance(subtype, deviceState()));
@@ -201,7 +191,6 @@ ANARIMaterial OSPRayDevice::newMaterial(const char *subtype)
 
 ANARISampler OSPRayDevice::newSampler(const char *subtype)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return getHandleForAPI<ANARISampler>(
       Sampler::createInstance(subtype, deviceState()));
@@ -211,14 +200,12 @@ ANARISampler OSPRayDevice::newSampler(const char *subtype)
 
 ANARIGroup OSPRayDevice::newGroup()
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return createObjectForAPI<Group, ANARIGroup>(deviceState());
 }
 
 ANARIInstance OSPRayDevice::newInstance()
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return createObjectForAPI<Instance, ANARIInstance>(deviceState());
 }
@@ -227,7 +214,6 @@ ANARIInstance OSPRayDevice::newInstance()
 
 ANARIWorld OSPRayDevice::newWorld()
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return createObjectForAPI<World, ANARIWorld>(deviceState());
 }
@@ -244,8 +230,7 @@ const void *OSPRayDevice::getObjectInfo(ANARIDataType objectType,
     const char *infoName,
     ANARIDataType infoType)
 {
-  return query_object_info(
-      objectType, objectSubtype, infoName, infoType);
+  return query_object_info(objectType, objectSubtype, infoName, infoType);
 }
 
 const void *OSPRayDevice::getParameterInfo(ANARIDataType objectType,
@@ -311,6 +296,53 @@ void OSPRayDevice::unsetParameter(ANARIObject o, const char *name)
   helium::BaseDevice::unsetParameter(o, name);
 }
 
+void *OSPRayDevice::mapParameterArray1D(ANARIObject object,
+    const char *name,
+    ANARIDataType dataType,
+    uint64_t numElements1,
+    uint64_t *elementStride)
+{
+  OSPRayDeviceScope ds(this);
+  return helium::BaseDevice::mapParameterArray1D(
+      object, name, dataType, numElements1, elementStride);
+}
+
+void *OSPRayDevice::mapParameterArray2D(ANARIObject object,
+    const char *name,
+    ANARIDataType dataType,
+    uint64_t numElements1,
+    uint64_t numElements2,
+    uint64_t *elementStride)
+{
+  OSPRayDeviceScope ds(this);
+  return helium::BaseDevice::mapParameterArray2D(
+      object, name, dataType, numElements1, numElements2, elementStride);
+}
+
+void *OSPRayDevice::mapParameterArray3D(ANARIObject object,
+    const char *name,
+    ANARIDataType dataType,
+    uint64_t numElements1,
+    uint64_t numElements2,
+    uint64_t numElements3,
+    uint64_t *elementStride)
+{
+  OSPRayDeviceScope ds(this);
+  return helium::BaseDevice::mapParameterArray3D(object,
+      name,
+      dataType,
+      numElements1,
+      numElements2,
+      numElements3,
+      elementStride);
+}
+
+void OSPRayDevice::unmapParameterArray(ANARIObject object, const char *name)
+{
+  OSPRayDeviceScope ds(this);
+  helium::BaseDevice::unmapParameterArray(object, name);
+}
+
 void OSPRayDevice::commitParameters(ANARIObject o)
 {
   OSPRayDeviceScope ds(this);
@@ -333,7 +365,6 @@ void OSPRayDevice::retain(ANARIObject o)
 
 ANARIFrame OSPRayDevice::newFrame()
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return createObjectForAPI<Frame, ANARIFrame>(deviceState());
 }
@@ -359,7 +390,6 @@ void OSPRayDevice::frameBufferUnmap(ANARIFrame f, const char *channel)
 
 ANARIRenderer OSPRayDevice::newRenderer(const char *subtype)
 {
-  initDevice();
   OSPRayDeviceScope ds(this);
   return getHandleForAPI<ANARIRenderer>(
       Renderer::createInstance(subtype, deviceState()));
@@ -520,6 +550,7 @@ OSPRayGlobalState *OSPRayDevice::deviceState() const
 OSPRayDevice::OSPRayDeviceScope::OSPRayDeviceScope(OSPRayDevice *d)
     : m_device(d)
 {
+  d->initDevice();
   m_device->setOSPRayDevice();
 }
 

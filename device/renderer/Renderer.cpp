@@ -4,6 +4,7 @@
 #include "Renderer.h"
 // subtypes
 #include "Debug.h"
+#include "Pathtracer.h"
 #include "SciVis.h"
 
 namespace anari_ospray {
@@ -44,6 +45,8 @@ Renderer *Renderer::createInstance(
 {
   if (subtype == "scivis" || subtype == "default")
     return new SciVis(s);
+  else if (subtype == "pathtracer")
+    return new Pathtracer(s);
   else if (subtype == "debug")
     return new Debug(s);
   else

@@ -41,6 +41,7 @@ project_sources(PRIVATE
   camera/Perspective.cpp
   frame/Frame.cpp
   renderer/Debug.cpp
+  renderer/Pathtracer.cpp
   renderer/Renderer.cpp
   renderer/SciVis.cpp
   scene/Group.cpp

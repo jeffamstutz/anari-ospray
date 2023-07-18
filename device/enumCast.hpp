@@ -89,12 +89,16 @@ inline OSPDataType enumCast(int value)
   case ANARI_INT8:
     return OSP_CHAR;
   case ANARI_UINT8:
+  case ANARI_UFIXED8:
     return OSP_UCHAR;
   case ANARI_UINT8_VEC2:
+  case ANARI_UFIXED8_VEC2:
     return OSP_VEC2UC;
   case ANARI_UINT8_VEC3:
+  case ANARI_UFIXED8_VEC3:
     return OSP_VEC3UC;
   case ANARI_UINT8_VEC4:
+  case ANARI_UFIXED8_VEC4:
     return OSP_VEC4UC;
   case ANARI_INT16:
     return OSP_SHORT;

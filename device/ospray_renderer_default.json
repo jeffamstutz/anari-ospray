@@ -94,37 +94,46 @@
       "description": "ambient light intensity"
     },
     {
-     "name": "aoSamples",
+     "name": "lightSamples",
      "tags": [],
-     "default": 0,
-     "description": "number of rays per sample to compute ambient occlusion",
+     "default": -1,
+     "description": "number of random light samples per path vertex, per default all light sources are sampled",
      "types": [
       "ANARI_INT32"
      ]
     },
     {
-     "name": "aoDistance",
+     "name": "roulettePathDepth",
+     "tags": [],
+     "default": 5,
+     "description": "ray recursion depth at which to start Russian roulette termination",
+     "types": [
+      "ANARI_INT32"
+     ]
+    },
+    {
+     "name": "maxScatteringEvents",
+     "tags": [],
+     "default": 20,
+     "description": "maximum number of non-specular (i.e., diffuse and glossy) bounces",
+     "types": [
+      "ANARI_INT32"
+     ]
+    },
+    {
+     "name": "maxContribution",
      "tags": [],
      "default": 1e20,
-     "description": "maximum distance to consider for ambient occlusion",
+     "description": "samples are clamped to this value before they are accumulated into the framebuffer",
      "types": [
       "ANARI_FLOAT32"
      ]
     },
     {
-     "name": "volumeSamplingRate",
-     "tags": [],
-     "default": 1.0,
-     "description": "sampling rate for volumes",
-     "types": [
-      "ANARI_FLOAT32"
-     ]
-    },
-    {
-     "name": "visibleLights",
+     "name": "backgroundRefraction",
      "tags": [],
      "default": false,
-     "description": "whether light sources are potentially visible (as in the path tracer, regarding each light's visible)",
+     "description": "allow for alpha blending even if background is seen through refractive objects like glass",
      "types": [
       "ANARI_BOOL"
      ]

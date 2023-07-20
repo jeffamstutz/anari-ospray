@@ -1007,7 +1007,7 @@ static const void * ANARI_RENDERER_default_ambientRadiance_info(ANARIDataType pa
       default: return nullptr;
    }
 }
-static const void * ANARI_RENDERER_default_aoSamples_info(ANARIDataType paramType, int infoName, ANARIDataType infoType) {
+static const void * ANARI_RENDERER_default_lightSamples_info(ANARIDataType paramType, int infoName, ANARIDataType infoType) {
    (void)paramType;
    switch(infoName) {
       case 0: // required
@@ -1018,20 +1018,68 @@ static const void * ANARI_RENDERER_default_aoSamples_info(ANARIDataType paramTyp
          }
       case 1: // default
          if(paramType == ANARI_INT32 && infoType == ANARI_INT32) {
-            static const int32_t default_value[1] = {INT32_C(0)};
+            static const int32_t default_value[1] = {INT32_C(-1)};
             return default_value;
          } else {
             return nullptr;
          }
       case 4: // description
          {
-            static const char *description = "number of rays per sample to compute ambient occlusion";
+            static const char *description = "number of random light samples per path vertex, per default all light sources are sampled";
             return description;
          }
       default: return nullptr;
    }
 }
-static const void * ANARI_RENDERER_default_aoDistance_info(ANARIDataType paramType, int infoName, ANARIDataType infoType) {
+static const void * ANARI_RENDERER_default_roulettePathDepth_info(ANARIDataType paramType, int infoName, ANARIDataType infoType) {
+   (void)paramType;
+   switch(infoName) {
+      case 0: // required
+         if(infoType == ANARI_BOOL) {
+            return &anari_false;
+         } else {
+            return nullptr;
+         }
+      case 1: // default
+         if(paramType == ANARI_INT32 && infoType == ANARI_INT32) {
+            static const int32_t default_value[1] = {INT32_C(5)};
+            return default_value;
+         } else {
+            return nullptr;
+         }
+      case 4: // description
+         {
+            static const char *description = "ray recursion depth at which to start Russian roulette termination";
+            return description;
+         }
+      default: return nullptr;
+   }
+}
+static const void * ANARI_RENDERER_default_maxScatteringEvents_info(ANARIDataType paramType, int infoName, ANARIDataType infoType) {
+   (void)paramType;
+   switch(infoName) {
+      case 0: // required
+         if(infoType == ANARI_BOOL) {
+            return &anari_false;
+         } else {
+            return nullptr;
+         }
+      case 1: // default
+         if(paramType == ANARI_INT32 && infoType == ANARI_INT32) {
+            static const int32_t default_value[1] = {INT32_C(20)};
+            return default_value;
+         } else {
+            return nullptr;
+         }
+      case 4: // description
+         {
+            static const char *description = "maximum number of non-specular (i.e., diffuse and glossy) bounces";
+            return description;
+         }
+      default: return nullptr;
+   }
+}
+static const void * ANARI_RENDERER_default_maxContribution_info(ANARIDataType paramType, int infoName, ANARIDataType infoType) {
    (void)paramType;
    switch(infoName) {
       case 0: // required
@@ -1049,37 +1097,13 @@ static const void * ANARI_RENDERER_default_aoDistance_info(ANARIDataType paramTy
          }
       case 4: // description
          {
-            static const char *description = "maximum distance to consider for ambient occlusion";
+            static const char *description = "samples are clamped to this value before they are accumulated into the framebuffer";
             return description;
          }
       default: return nullptr;
    }
 }
-static const void * ANARI_RENDERER_default_volumeSamplingRate_info(ANARIDataType paramType, int infoName, ANARIDataType infoType) {
-   (void)paramType;
-   switch(infoName) {
-      case 0: // required
-         if(infoType == ANARI_BOOL) {
-            return &anari_false;
-         } else {
-            return nullptr;
-         }
-      case 1: // default
-         if(paramType == ANARI_FLOAT32 && infoType == ANARI_FLOAT32) {
-            static const float default_value[1] = {1.000000f};
-            return default_value;
-         } else {
-            return nullptr;
-         }
-      case 4: // description
-         {
-            static const char *description = "sampling rate for volumes";
-            return description;
-         }
-      default: return nullptr;
-   }
-}
-static const void * ANARI_RENDERER_default_visibleLights_info(ANARIDataType paramType, int infoName, ANARIDataType infoType) {
+static const void * ANARI_RENDERER_default_backgroundRefraction_info(ANARIDataType paramType, int infoName, ANARIDataType infoType) {
    (void)paramType;
    switch(infoName) {
       case 0: // required
@@ -1097,7 +1121,7 @@ static const void * ANARI_RENDERER_default_visibleLights_info(ANARIDataType para
          }
       case 4: // description
          {
-            static const char *description = "whether light sources are potentially visible (as in the path tracer, regarding each light's visible)";
+            static const char *description = "allow for alpha blending even if background is seen through refractive objects like glass";
             return description;
          }
       default: return nullptr;
@@ -1123,14 +1147,16 @@ static const void * ANARI_RENDERER_default_param_info(const char *paramName, ANA
          return ANARI_RENDERER_default_ambientColor_info(paramType, infoName, infoType);
       case 4:
          return ANARI_RENDERER_default_ambientRadiance_info(paramType, infoName, infoType);
-      case 6:
-         return ANARI_RENDERER_default_aoSamples_info(paramType, infoName, infoType);
-      case 5:
-         return ANARI_RENDERER_default_aoDistance_info(paramType, infoName, infoType);
-      case 91:
-         return ANARI_RENDERER_default_volumeSamplingRate_info(paramType, infoName, infoType);
-      case 89:
-         return ANARI_RENDERER_default_visibleLights_info(paramType, infoName, infoType);
+      case 39:
+         return ANARI_RENDERER_default_lightSamples_info(paramType, infoName, infoType);
+      case 67:
+         return ANARI_RENDERER_default_roulettePathDepth_info(paramType, infoName, infoType);
+      case 43:
+         return ANARI_RENDERER_default_maxScatteringEvents_info(paramType, infoName, infoType);
+      case 41:
+         return ANARI_RENDERER_default_maxContribution_info(paramType, infoName, infoType);
+      case 10:
+         return ANARI_RENDERER_default_backgroundRefraction_info(paramType, infoName, infoType);
       default:
          return nullptr;
    }
@@ -8558,10 +8584,11 @@ static const void * ANARI_RENDERER_default_info(int infoName, ANARIDataType info
                {"shadows", ANARI_BOOL},
                {"ambientColor", ANARI_FLOAT32_VEC3},
                {"ambientRadiance", ANARI_FLOAT32},
-               {"aoSamples", ANARI_INT32},
-               {"aoDistance", ANARI_FLOAT32},
-               {"volumeSamplingRate", ANARI_FLOAT32},
-               {"visibleLights", ANARI_BOOL},
+               {"lightSamples", ANARI_INT32},
+               {"roulettePathDepth", ANARI_INT32},
+               {"maxScatteringEvents", ANARI_INT32},
+               {"maxContribution", ANARI_FLOAT32},
+               {"backgroundRefraction", ANARI_BOOL},
                {0, ANARI_UNKNOWN}
             };
             return parameters;

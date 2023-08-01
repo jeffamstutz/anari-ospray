@@ -1,11 +1,8 @@
 ﻿// Copyright 2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "anari_library_ospray_export.h"
-
 #include "OSPRayDevice.h"
 
-#include "anari/backend/LibraryImpl.h"
 #include "anari/ext/debug/DebugObject.h"
 
 #include "array/Array1D.h"
@@ -560,25 +557,3 @@ OSPRayDevice::OSPRayDeviceScope::~OSPRayDeviceScope()
 }
 
 } // namespace anari_ospray
-
-extern "C" ANARI_OSPRAY_DEVICE_INTERFACE ANARI_DEFINE_LIBRARY_NEW_DEVICE(
-    ospray, library, _subtype)
-{
-  auto subtype = std::string_view(_subtype);
-  if (subtype == "default" || subtype == "ospray")
-    return (ANARIDevice) new anari_ospray::OSPRayDevice(library);
-  return nullptr;
-}
-
-extern "C" ANARI_OSPRAY_DEVICE_INTERFACE
-ANARI_DEFINE_LIBRARY_GET_DEVICE_SUBTYPES(ospray, libdata)
-{
-  static const char *devices[] = {"ospray", nullptr};
-  return devices;
-}
-
-extern "C" ANARI_OSPRAY_DEVICE_INTERFACE ANARIDevice anariNewOSPRayDevice(
-    ANARIStatusCallback defaultCallback, const void *userPtr)
-{
-  return (ANARIDevice) new anari_ospray::OSPRayDevice(defaultCallback, userPtr);
-}

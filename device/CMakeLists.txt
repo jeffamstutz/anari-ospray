@@ -30,6 +30,7 @@ project_sources(PRIVATE
   OSPRayDeviceQueries.cpp
   OSPRayDeviceDebugFactory.cpp
   OSPRayGlobalState.cpp
+  OSPRayLibrary.cpp
   Object.cpp
   array/Array.cpp
   array/Array1D.cpp

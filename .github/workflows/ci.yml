@@ -81,12 +81,12 @@ jobs:
       artifact-out: build-windows
       artifact-path: build/install
 
-  build-windows-msvc15:
+  build-windows-msvc16:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/windows.yml@main
     with:
       cmd: |
-        .github\workflows\build.ps1 -G "Visual Studio 15 2017 Win64"
-      artifact-out: build-windows-msvc15
+        .github\workflows\build.ps1 -G "Visual Studio 16 2019"
+      artifact-out: build-windows-msvc16
       artifact-path: build/install
 
   build-windows-msvc17:
@@ -166,14 +166,14 @@ jobs:
         ./build/install/bin/anariRenderTests
       artifact-in: build-osx
 
-  test-windows-msvc15:
-    needs: build-windows-msvc15
+  test-windows-msvc16:
+    needs: build-windows-msvc16
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/windows.yml@main
     with:
       cmd: |
         $env:ANARI_LIBRARY="ospray"
         ./build/install/bin/anariRenderTests
-      artifact-in: build-windows-msvc15
+      artifact-in: build-windows-msvc16
 
   test-windows-msvc17:
     needs: build-windows-msvc17
@@ -192,7 +192,6 @@ jobs:
     secrets: inherit
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/static_analysis.yml@main
     with:
-      coverity: true
       project: ANARI OSPRay
       server: prod4
       prebuild: >

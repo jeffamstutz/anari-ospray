@@ -252,24 +252,34 @@ int OSPRayDevice::getProperty(ANARIObject object,
 {
   OSPRayDeviceScope ds(this);
 
-  if (handleIsDevice(object)) {
-    std::string_view prop = name;
-    if (prop == "extension" && type == ANARI_STRING_LIST) {
-      helium::writeToVoidP(mem, query_extensions());
-      return 1;
-    } else if (prop == "ospray" && type == ANARI_BOOL) {
-      helium::writeToVoidP(mem, true);
-      return 1;
-    }
-  } else {
-    if (mask == ANARI_WAIT) {
-      deviceState()->waitOnCurrentFrame();
-      m_state->commitBuffer.flush();
-    }
-    return helium::referenceFromHandle(object).getProperty(
-        name, type, mem, mask);
-  }
+  if (handleIsDevice(object))
+    return deviceGetProperty(name, type, mem, size, mask);
 
+  if (mask == ANARI_WAIT) {
+    deviceState()->waitOnCurrentFrame();
+    m_state->commitBuffer.flush();
+  }
+  return helium::referenceFromHandle(object).getProperty(
+      name, type, mem, size, mask);
+}
+
+int OSPRayDevice::deviceGetProperty(const char *name,
+    ANARIDataType type,
+    void *mem,
+    uint64_t size,
+    uint32_t /*mask*/)
+{
+  std::string_view prop = name;
+  if (prop == "extension" && type == ANARI_STRING_LIST) {
+    if (size >= sizeof(const char **))
+      helium::writeToVoidP(mem, query_extensions());
+    return 1;
+  }
+  if (prop == "ospray" && type == ANARI_BOOL) {
+    if (size)
+      helium::writeToVoidP(mem, (uint8_t)1);
+    return 1;
+  }
   return 0;
 }
 

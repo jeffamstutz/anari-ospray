@@ -95,17 +95,20 @@ void Frame::initFB(const bool denoising)
   }
 }
 
-bool Frame::getProperty(
-    const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
+bool Frame::getProperty(const std::string_view &name,
+    ANARIDataType type,
+    void *ptr,
+    uint64_t size,
+    uint32_t flags)
 {
   if (type == ANARI_FLOAT32 && name == "duration") {
     if (flags & ANARI_WAIT)
       wait();
-    helium::writeToVoidP(ptr, m_duration);
+    std::memcpy(ptr, &m_duration, std::min((size_t)size, sizeof(m_duration)));
     return true;
   }
 
-  return 0;
+  return false;
 }
 
 void Frame::renderFrame()

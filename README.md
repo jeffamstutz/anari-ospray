@@ -8,7 +8,7 @@ to Intel® [OSPRay](https://www.ospray.org): ANARILibrary and ANARIDevice
 
 - CMake
 - C++11 compiler
-- [ANARI-SDK](https://github.com/KhronosGroup/ANARI-SDK) v0.13.0 or later
+- [ANARI-SDK](https://github.com/KhronosGroup/ANARI-SDK) v0.15.0 or later
 - [OSPRay](https://www.github.com/ospray/ospray) v3.2.0+
 - Python 3
 

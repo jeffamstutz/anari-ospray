@@ -137,10 +137,13 @@ void Array::markDataModified()
   m_lastDataModified = helium::newTimeStamp();
 }
 
-bool Array::getProperty(
-    const std::string_view &name, ANARIDataType type, void *ptr, uint32_t flags)
+bool Array::getProperty(const std::string_view &/*name*/,
+    ANARIDataType,
+    void * /*ptr*/,
+    uint64_t /*size*/,
+    uint32_t /*flags*/)
 {
-  return 0;
+  return false;
 }
 
 void Array::commitParameters()

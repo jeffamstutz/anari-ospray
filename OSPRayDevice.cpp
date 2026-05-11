@@ -267,7 +267,7 @@ int OSPRayDevice::getProperty(ANARIObject object,
       m_state->commitBuffer.flush();
     }
     return helium::referenceFromHandle(object).getProperty(
-        name, type, mem, mask);
+        name, type, mem, size, mask);
   }
 
   return 0;

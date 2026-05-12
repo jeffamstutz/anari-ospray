@@ -6,6 +6,34 @@
 #include <chrono>
 
 namespace anari_ospray {
+namespace {
+
+bool channelIsColor(std::string_view channel)
+{
+  return channel == "color" || channel == "channel.color";
+}
+
+bool channelIsDepth(std::string_view channel)
+{
+  return channel == "depth" || channel == "channel.depth";
+}
+
+bool channelIsPrimitiveId(std::string_view channel)
+{
+  return channel == "primitiveId" || channel == "channel.primitiveId";
+}
+
+bool channelIsNormal(std::string_view channel)
+{
+  return channel == "normal" || channel == "channel.normal";
+}
+
+bool channelIsAlbedo(std::string_view channel)
+{
+  return channel == "albedo" || channel == "channel.albedo";
+}
+
+} // namespace
 
 OSPFrameBufferFormat osprayFormatFromANARI(anari::DataType a)
 {
@@ -25,7 +53,7 @@ Frame::Frame(OSPRayGlobalState *s) : helium::BaseFrame(s) {}
 Frame::~Frame()
 {
   wait();
-  ospRelease(m_osprayFrameBuffer);
+  releaseFB();
   ospRelease(m_osprayDenoiser);
 }
 
@@ -46,6 +74,11 @@ void Frame::commitParameters()
   m_camera = getParamObject<Camera>("camera");
   m_world = getParamObject<World>("world");
   m_colorType = getParam<anari::DataType>("channel.color", ANARI_UNKNOWN);
+  m_depthType = getParam<anari::DataType>("channel.depth", ANARI_UNKNOWN);
+  m_primIdType =
+      getParam<anari::DataType>("channel.primitiveId", ANARI_UNKNOWN);
+  m_normalType = getParam<anari::DataType>("channel.normal", ANARI_UNKNOWN);
+  m_albedoType = getParam<anari::DataType>("channel.albedo", ANARI_UNKNOWN);
   m_frameData.size = getParam<uint2>("size", uint2(10));
 }
 
@@ -66,15 +99,42 @@ void Frame::finalize()
         ANARI_SEVERITY_WARNING, "missing required parameter 'world' on frame");
   }
 
-  initFB(m_renderer->denoise());
+  initFB(m_renderer && m_renderer->denoise());
 }
 
 void Frame::initFB(const bool denoising)
 {
+  wait();
+  releaseFB();
+
   m_denoising = denoising;
   auto flags = OSP_FB_COLOR | OSP_FB_DEPTH | OSP_FB_ACCUM;
-  if (m_denoising)
-    flags |= OSP_FB_ALBEDO | OSP_FB_NORMAL;
+  if (m_denoising || m_normalType == ANARI_FLOAT32_VEC3)
+    flags |= OSP_FB_NORMAL;
+  if (m_denoising || m_albedoType == ANARI_FLOAT32_VEC3)
+    flags |= OSP_FB_ALBEDO;
+  if (m_primIdType == ANARI_UINT32)
+    flags |= OSP_FB_ID_PRIMITIVE;
+  if (m_depthType != ANARI_UNKNOWN && m_depthType != ANARI_FLOAT32) {
+    reportMessage(ANARI_SEVERITY_WARNING,
+        "unsupported frame channel type for 'channel.depth', expected "
+        "ANARI_FLOAT32");
+  }
+  if (m_primIdType != ANARI_UNKNOWN && m_primIdType != ANARI_UINT32) {
+    reportMessage(ANARI_SEVERITY_WARNING,
+        "unsupported frame channel type for 'channel.primitiveId', expected "
+        "ANARI_UINT32");
+  }
+  if (m_normalType != ANARI_UNKNOWN && m_normalType != ANARI_FLOAT32_VEC3) {
+    reportMessage(ANARI_SEVERITY_WARNING,
+        "unsupported frame channel type for 'channel.normal', expected "
+        "ANARI_FLOAT32_VEC3");
+  }
+  if (m_albedoType != ANARI_UNKNOWN && m_albedoType != ANARI_FLOAT32_VEC3) {
+    reportMessage(ANARI_SEVERITY_WARNING,
+        "unsupported frame channel type for 'channel.albedo', expected "
+        "ANARI_FLOAT32_VEC3");
+  }
 
   m_osprayFrameBuffer = ospNewFrameBuffer(m_frameData.size.x,
       m_frameData.size.y,
@@ -91,6 +151,18 @@ void Frame::initFB(const bool denoising)
     ospCommit(m_osprayFrameBuffer);
     ospRelease(data);
   }
+}
+
+void Frame::releaseFB()
+{
+  m_osprayColorBuffer = nullptr;
+  m_osprayDepthBuffer = nullptr;
+  m_osprayPrimIdBuffer = nullptr;
+  m_osprayNormalBuffer = nullptr;
+  m_osprayAlbedoBuffer = nullptr;
+
+  ospRelease(m_osprayFrameBuffer);
+  m_osprayFrameBuffer = nullptr;
 }
 
 bool Frame::getProperty(
@@ -163,30 +235,65 @@ void *Frame::map(std::string_view channel,
   *width = m_frameData.size.x;
   *height = m_frameData.size.y;
 
-  if (channel == "color" || channel == "channel.color") {
+  const void *mapped = nullptr;
+  if (channelIsColor(channel)) {
     *pixelType = m_colorType;
-    return (void *)(m_osprayColorBuffer =
-                        ospMapFrameBuffer(m_osprayFrameBuffer, OSP_FB_COLOR));
-  } else if (channel == "depth" || channel == "channel.depth") {
+    mapped = m_osprayColorBuffer =
+        ospMapFrameBuffer(m_osprayFrameBuffer, OSP_FB_COLOR);
+  } else if (channelIsDepth(channel)) {
     *pixelType = ANARI_FLOAT32;
-    return (void *)(m_osprayDepthBuffer =
-                        ospMapFrameBuffer(m_osprayFrameBuffer, OSP_FB_DEPTH));
-  } else {
-    *width = 0;
-    *height = 0;
-    *pixelType = ANARI_UNKNOWN;
-    return nullptr;
+    mapped = m_osprayDepthBuffer =
+        ospMapFrameBuffer(m_osprayFrameBuffer, OSP_FB_DEPTH);
+  } else if (channelIsPrimitiveId(channel)) {
+    *pixelType = ANARI_UINT32;
+    mapped = m_osprayPrimIdBuffer =
+        ospMapFrameBuffer(m_osprayFrameBuffer, OSP_FB_ID_PRIMITIVE);
+  } else if (channelIsNormal(channel)) {
+    *pixelType = ANARI_FLOAT32_VEC3;
+    mapped = m_osprayNormalBuffer =
+        ospMapFrameBuffer(m_osprayFrameBuffer, OSP_FB_NORMAL);
+  } else if (channelIsAlbedo(channel)) {
+    *pixelType = ANARI_FLOAT32_VEC3;
+    mapped = m_osprayAlbedoBuffer =
+        ospMapFrameBuffer(m_osprayFrameBuffer, OSP_FB_ALBEDO);
   }
+
+  if (mapped)
+    return (void *)mapped;
+
+  *width = 0;
+  *height = 0;
+  *pixelType = ANARI_UNKNOWN;
+  return nullptr;
 }
 
 void Frame::unmap(std::string_view channel)
 {
-  if (channel == "color" || channel == "channel.color") {
-    if (m_osprayColorBuffer)
+  if (channelIsColor(channel)) {
+    if (m_osprayColorBuffer) {
       ospUnmapFrameBuffer(m_osprayColorBuffer, m_osprayFrameBuffer);
-  } else if (channel == "depth" || channel == "channel.depth") {
-    if (m_osprayDepthBuffer)
+      m_osprayColorBuffer = nullptr;
+    }
+  } else if (channelIsDepth(channel)) {
+    if (m_osprayDepthBuffer) {
       ospUnmapFrameBuffer(m_osprayDepthBuffer, m_osprayFrameBuffer);
+      m_osprayDepthBuffer = nullptr;
+    }
+  } else if (channelIsPrimitiveId(channel)) {
+    if (m_osprayPrimIdBuffer) {
+      ospUnmapFrameBuffer(m_osprayPrimIdBuffer, m_osprayFrameBuffer);
+      m_osprayPrimIdBuffer = nullptr;
+    }
+  } else if (channelIsNormal(channel)) {
+    if (m_osprayNormalBuffer) {
+      ospUnmapFrameBuffer(m_osprayNormalBuffer, m_osprayFrameBuffer);
+      m_osprayNormalBuffer = nullptr;
+    }
+  } else if (channelIsAlbedo(channel)) {
+    if (m_osprayAlbedoBuffer) {
+      ospUnmapFrameBuffer(m_osprayAlbedoBuffer, m_osprayFrameBuffer);
+      m_osprayAlbedoBuffer = nullptr;
+    }
   }
 }
 

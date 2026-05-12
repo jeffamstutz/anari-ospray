@@ -47,6 +47,7 @@ struct Frame : public helium::BaseFrame
 
  private:
   void initFB(const bool denoising);
+  void releaseFB();
 
   struct FrameData
   {
@@ -56,6 +57,9 @@ struct Frame : public helium::BaseFrame
 
   anari::DataType m_colorType{ANARI_UNKNOWN};
   anari::DataType m_depthType{ANARI_UNKNOWN};
+  anari::DataType m_primIdType{ANARI_UNKNOWN};
+  anari::DataType m_normalType{ANARI_UNKNOWN};
+  anari::DataType m_albedoType{ANARI_UNKNOWN};
 
   helium::IntrusivePtr<Renderer> m_renderer;
   helium::IntrusivePtr<Camera> m_camera;
@@ -76,6 +80,9 @@ struct Frame : public helium::BaseFrame
 
   const void *m_osprayColorBuffer{nullptr};
   const void *m_osprayDepthBuffer{nullptr};
+  const void *m_osprayPrimIdBuffer{nullptr};
+  const void *m_osprayNormalBuffer{nullptr};
+  const void *m_osprayAlbedoBuffer{nullptr};
 };
 
 } // namespace anari_ospray

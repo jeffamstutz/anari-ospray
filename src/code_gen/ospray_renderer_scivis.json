@@ -65,7 +65,7 @@
     {
      "name": "shadows",
      "tags": [],
-     "default": false,
+     "default": true,
      "description": "whether to compute (hard) shadows",
      "types": [
       "ANARI_BOOL"
@@ -96,7 +96,7 @@
     {
      "name": "aoSamples",
      "tags": [],
-     "default": 0,
+     "default": 1,
      "description": "number of rays per sample to compute ambient occlusion",
      "types": [
       "ANARI_INT32"

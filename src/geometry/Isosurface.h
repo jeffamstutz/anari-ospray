@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Geometry.h"
-#include "scene/volume/spatial_field/SpatialField.h"
+#include "spatial_field/SpatialField.h"
 
 namespace anari_ospray {
 

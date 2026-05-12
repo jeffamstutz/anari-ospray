@@ -1,31 +1,31 @@
 // Copyright 2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#include "Image1D.h"
-#include "scene/surface/geometry/Geometry.h"
+#include "Image2D.h"
+#include "geometry/Geometry.h"
 
 namespace anari_ospray {
 
-Image1D::Image1D(OSPRayGlobalState *s) : Sampler(s), m_image(this)
+Image2D::Image2D(OSPRayGlobalState *s) : Sampler(s), m_image(this)
 {
   m_osprayTexture = ospNewTexture("texture2d");
 }
 
-bool Image1D::isValid() const
+bool Image2D::isValid() const
 {
   return Sampler::isValid() && m_image;
 }
 
-void Image1D::commitParameters()
+void Image2D::commitParameters()
 {
   Sampler::commitParameters();
-  m_image = getParamObject<Array1D>("image");
+  m_image = getParamObject<Array2D>("image");
   m_inAttribute =
       attributeFromString(getParamString("inAttribute", "attribute0"));
   m_filter = getParamString("filter", "linear");
 }
 
-void Image1D::finalize()
+void Image2D::finalize()
 {
   if (!m_image) {
     reportMessage(ANARI_SEVERITY_WARNING,
@@ -41,8 +41,8 @@ void Image1D::finalize()
   ospSetParam(ot, "filter", OSP_UINT, &filter);
 
   auto unpackedColors = convertToColorArray(*m_image);
-  auto d = ospNewSharedData1D(
-      unpackedColors.data(), OSP_VEC4F, unpackedColors.size());
+  auto size = m_image->size();
+  auto d = ospNewSharedData2D(unpackedColors.data(), OSP_VEC4F, size.x, size.y);
   ospSetParam(ot, "data", OSP_DATA, &d);
   ospRelease(d);
 
@@ -51,7 +51,7 @@ void Image1D::finalize()
   m_unpackedColors = std::move(unpackedColors);
 }
 
-Attribute Image1D::inAttribute() const
+Attribute Image2D::inAttribute() const
 {
   return m_inAttribute;
 }

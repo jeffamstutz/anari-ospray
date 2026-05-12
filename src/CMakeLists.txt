@@ -19,6 +19,7 @@ project_sources(PRIVATE
   camera/Orthographic.cpp
   camera/Perspective.cpp
   frame/Frame.cpp
+  renderer/AO.cpp
   renderer/Debug.cpp
   renderer/Pathtracer.cpp
   renderer/Renderer.cpp
@@ -55,11 +56,14 @@ project_sources(PRIVATE
   volume/Volume.cpp
 )
 
+file(GLOB OSPRAY_DEVICE_JSONS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/code_gen "*.json")
+
 anari_generate_queries(
   DEVICE_TARGET ${PROJECT_NAME}
   CPP_NAMESPACE anari_ospray
-  JSON_DEFINITIONS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/code_gen/ospray_device.json
   JSON_ROOT_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/code_gen
+  JSON_DEFINITIONS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/code_gen/ospray_device.json
+  JSON_EXTENSION_FILES ${OSPRAY_DEVICE_JSONS}
 )
 
 include(GenerateExportHeader)

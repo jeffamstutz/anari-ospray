@@ -1,13 +1,13 @@
 {
   "info": {
-  "name": "OSPRAY_RENDERER_DEFAULT",
+  "name": "OSPRAY_RENDERER_AO",
   "type": "extension",
   "dependencies": []
   },
  "objects": [
   {
-   "name": "default",
-   "description": "The path tracer supports soft shadows, indirect illumination and realistic materials.",
+   "name": "ao",
+   "description": "The Ambient Occlusion renderer supports a subset of the SciVis renderer features for performance. Its main shading method is ambient occlusion, lights are not considered, and volume rendering is supported.",
    "properties": [],
    "type": "ANARI_RENDERER",
    "parameters": [
@@ -85,48 +85,39 @@
       "description": "ambient light intensity"
     },
     {
-     "name": "lightSamples",
+     "name": "aoSamples",
      "tags": [],
-     "default": -1,
-     "description": "number of random light samples per path vertex, per default all light sources are sampled",
+     "default": 1,
+     "description": "number of rays per sample to compute ambient occlusion",
      "types": [
       "ANARI_INT32"
      ]
     },
     {
-     "name": "roulettePathLength",
-     "tags": [],
-     "default": 5,
-     "description": "ray recursion depth at which to start Russian roulette termination",
-     "types": [
-      "ANARI_INT32"
-     ]
-    },
-    {
-     "name": "maxScatteringEvents",
-     "tags": [],
-     "default": 20,
-     "description": "maximum number of non-specular (i.e., diffuse and glossy) bounces",
-     "types": [
-      "ANARI_INT32"
-     ]
-    },
-    {
-     "name": "maxContribution",
+     "name": "aoDistance",
      "tags": [],
      "default": 1e20,
-     "description": "samples are clamped to this value before they are accumulated into the framebuffer",
+     "description": "maximum distance to consider for ambient occlusion",
      "types": [
       "ANARI_FLOAT32"
      ]
     },
     {
-     "name": "backgroundRefraction",
+     "name": "aoIntensity",
      "tags": [],
-     "default": false,
-     "description": "allow for alpha blending even if background is seen through refractive objects like glass",
+     "default": 1.0,
+     "description": "ambient occlusion strength",
      "types": [
-      "ANARI_BOOL"
+      "ANARI_FLOAT32"
+     ]
+    },
+    {
+     "name": "volumeSamplingRate",
+     "tags": [],
+     "default": 1.0,
+     "description": "sampling rate for volumes",
+     "types": [
+      "ANARI_FLOAT32"
      ]
     },
     {
@@ -161,4 +152,3 @@
   }
  ]
 }
-

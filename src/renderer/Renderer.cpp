@@ -3,6 +3,7 @@
 
 #include "Renderer.h"
 // subtypes
+#include "AO.h"
 #include "Debug.h"
 #include "Pathtracer.h"
 #include "SciVis.h"
@@ -70,6 +71,8 @@ Renderer *Renderer::createInstance(
 {
   if (subtype == "pathtracer" || (!s->distributed && subtype == "default"))
     return new Pathtracer(s);
+  else if (subtype == "ao")
+    return new AO(s);
   else if (subtype == "scivis")
     return new SciVis(s);
   else if (subtype == "mpiRaycast" || (s->distributed && subtype == "default"))

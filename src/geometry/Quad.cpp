@@ -8,7 +8,10 @@
 namespace anari_ospray {
 
 Quad::Quad(OSPRayGlobalState *s)
-    : Geometry(s, "mesh"), m_index(this), m_vertexPosition(this)
+    : Geometry(s, "mesh"),
+      m_index(this),
+      m_vertexPosition(this),
+      m_vertexNormal(this)
 {}
 
 void Quad::commitParameters()
@@ -16,6 +19,7 @@ void Quad::commitParameters()
   Geometry::commitParameters();
   m_index = getParamObject<Array1D>("primitive.index");
   m_vertexPosition = getParamObject<Array1D>("vertex.position");
+  m_vertexNormal = getParamObject<Array1D>("vertex.normal");
   m_vertexAttributes[0] = getParamObject<Array1D>("vertex.attribute0");
   m_vertexAttributes[1] = getParamObject<Array1D>("vertex.attribute1");
   m_vertexAttributes[2] = getParamObject<Array1D>("vertex.attribute2");
@@ -38,12 +42,17 @@ void Quad::finalize()
   // Remove old parameters //
 
   ospRemoveParam(og, "vertex.position");
+  ospRemoveParam(og, "vertex.normal");
   ospRemoveParam(og, "index");
 
   // Set new parameters //
 
   auto vpd = m_vertexPosition->osprayData();
   ospSetParam(og, "vertex.position", OSP_DATA, &vpd);
+  if (m_vertexNormal) {
+    auto vnd = m_vertexNormal->osprayData();
+    ospSetParam(og, "vertex.normal", OSP_DATA, &vnd);
+  }
   if (m_index) {
     auto id = m_index->osprayData();
     ospSetParam(og, "index", OSP_DATA, &id);

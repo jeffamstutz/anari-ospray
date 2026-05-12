@@ -16,6 +16,7 @@ struct StructuredRegularField : public SpatialField
   void finalize() override;
 
   bool isValid() const override;
+  bool dataIsUFixed8() const override;
 
  private:
   helium::IntrusivePtr<Array3D> m_data;

@@ -38,6 +38,11 @@ OSPVolume SpatialField::osprayVolume() const
   return m_osprayVolume;
 }
 
+bool SpatialField::dataIsUFixed8() const
+{
+  return false;
+}
+
 } // namespace anari_ospray
 
 OSPRAY_ANARI_TYPEFOR_DEFINITION(anari_ospray::SpatialField *);

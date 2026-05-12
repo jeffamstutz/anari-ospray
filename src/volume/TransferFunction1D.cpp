@@ -90,7 +90,10 @@ void TransferFunction1DVolume::finalize()
   }
 
   auto tf = m_osprayTF;
-  ospSetParam(tf, "value", OSP_BOX1F, &m_valueRange);
+  auto valueRange = m_valueRange;
+  if (m_field->dataIsUFixed8())
+    valueRange *= 255.f;
+  ospSetParam(tf, "value", OSP_BOX1F, &valueRange);
 
   m_unpackedColors.clear();
   m_unpackedOpacities.clear();

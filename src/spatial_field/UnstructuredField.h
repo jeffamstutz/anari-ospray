@@ -16,6 +16,7 @@ struct UnstructuredField : public SpatialField
   void finalize() override;
 
   bool isValid() const override;
+  bool dataIsUFixed8() const override;
 
  private:
   helium::IntrusivePtr<Array1D> m_vertex_position;

@@ -18,6 +18,7 @@ struct AMRField : public SpatialField
   void finalize() override;
 
   bool isValid() const override;
+  bool dataIsUFixed8() const override;
 
  private:
   helium::IntrusivePtr<Array1D> m_cellWidth;

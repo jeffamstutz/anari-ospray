@@ -3,6 +3,8 @@
 
 #include "AMRField.h"
 #include "array/Array3D.h"
+// std
+#include <algorithm>
 
 namespace anari_ospray {
 
@@ -96,6 +98,23 @@ void AMRField::finalize()
 bool AMRField::isValid() const
 {
   return m_block_data && m_block_bounds && m_block_level && m_cellWidth;
+}
+
+bool AMRField::dataIsUFixed8() const
+{
+  if (!m_block_data)
+    return false;
+
+  const auto begin = m_block_data->handlesBegin();
+  const auto end = m_block_data->handlesEnd();
+
+  if (begin == end)
+    return false;
+
+  return std::all_of(begin, end, [](const Object *o) {
+    const auto *a = dynamic_cast<const Array *>(o);
+    return a && a->elementType() == ANARI_UFIXED8;
+  });
 }
 
 } // namespace anari_ospray

@@ -15,6 +15,7 @@ struct SpatialField : public Object
       std::string_view subtype, OSPRayGlobalState *d);
 
   OSPVolume osprayVolume() const;
+  virtual bool dataIsUFixed8() const;
 
  protected:
   OSPVolume m_osprayVolume{nullptr};

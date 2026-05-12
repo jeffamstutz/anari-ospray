@@ -41,4 +41,9 @@ bool StructuredRegularField::isValid() const
   return m_data;
 }
 
+bool StructuredRegularField::dataIsUFixed8() const
+{
+  return m_data && m_data->elementType() == ANARI_UFIXED8;
+}
+
 } // namespace anari_ospray

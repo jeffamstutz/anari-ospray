@@ -84,4 +84,10 @@ bool UnstructuredField::isValid() const
         && m_cell_type;
 }
 
+bool UnstructuredField::dataIsUFixed8() const
+{
+  return (m_vertex_data && m_vertex_data->elementType() == ANARI_UFIXED8)
+      || (m_cell_data && m_cell_data->elementType() == ANARI_UFIXED8);
+}
+
 } // namespace anari_ospray

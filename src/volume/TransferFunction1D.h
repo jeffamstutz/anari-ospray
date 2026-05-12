@@ -23,6 +23,8 @@ struct TransferFunction1DVolume : public Volume
   helium::IntrusivePtr<SpatialField> m_field;
   helium::ChangeObserverPtr<Array1D> m_colorData;
   helium::ChangeObserverPtr<Array1D> m_opacityData;
+  std::vector<float3> m_unpackedColors;
+  std::vector<float> m_unpackedOpacities;
   float2 m_valueRange{0.f, 1.f};
   float m_densityScale{1.f};
 

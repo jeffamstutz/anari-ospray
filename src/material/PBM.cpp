@@ -12,6 +12,7 @@ void PBM::commitParameters()
   m_color = getParam<float3>("baseColor", float3(1.f));
   m_colorAttribute = attributeFromString(getParamString("baseColor", "none"));
   m_colorSampler = getParamObject<Sampler>("baseColor");
+  m_normalSampler = getParamObject<Sampler>("normal");
 
   m_opacity = getParam<float>("opacity", 1.f);
   m_metallic = getParam<float>("metallic", 1.f);
@@ -31,19 +32,30 @@ void PBM::commitParameters()
 
 void PBM::finalize()
 {
-  OSPTexture ot = nullptr;
+  OSPTexture colorTexture = nullptr;
+  OSPTexture normalTexture = nullptr;
   if (m_colorSampler && m_colorSampler->isValid()) {
     m_texcoordAttribute = m_colorSampler->inAttribute();
-    ot = m_colorSampler->osprayTexture();
-  } else
+    colorTexture = m_colorSampler->osprayTexture();
+  }
+
+  if (m_normalSampler && m_normalSampler->isValid()) {
+    if (!colorTexture)
+      m_texcoordAttribute = m_normalSampler->inAttribute();
+    normalTexture = m_normalSampler->osprayTexture();
+  } else if (!colorTexture)
     m_texcoordAttribute = Attribute::NONE;
 
   auto om = osprayMaterial();
   ospSetParam(om, "baseColor", OSP_VEC3F, &m_color);
-  if (ot)
-    ospSetParam(om, "map_baseColor", OSP_TEXTURE, &ot);
+  if (colorTexture)
+    ospSetParam(om, "map_baseColor", OSP_TEXTURE, &colorTexture);
   else
     ospRemoveParam(om, "map_baseColor");
+  if (normalTexture)
+    ospSetParam(om, "map_normal", OSP_TEXTURE, &normalTexture);
+  else
+    ospRemoveParam(om, "map_normal");
   ospSetParam(om, "opacity", OSP_FLOAT, &m_opacity);
   ospSetParam(om, "metallic", OSP_FLOAT, &m_metallic);
   ospSetParam(om, "roughness", OSP_FLOAT, &m_roughness);

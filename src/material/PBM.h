@@ -28,6 +28,7 @@ struct PBM : public Material
   float3 m_sheen{0.f};
   float m_sheenRoughness{0.f};
   float3 m_emissive{0.f};
+  helium::IntrusivePtr<Sampler> m_normalSampler;
 };
 
 } // namespace anari_ospray
